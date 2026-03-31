@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор семейного бюджета</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="landing-wrap">
+    <!-- Приветственный мини-лендинг -->
+    <section class="landing">
+      <div class="landing-nav">
+        <div class="brand">FamilyBudget</div>
+        <div class="landing-links">
+          <a class="link-btn" href="#appSection">Калькулятор</a>
+          <a class="link-btn" href="#expenseChartSection">График расходов</a>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h2 class="hero-title">Планируйте семейный бюджет в одном месте</h2>
+          <p class="hero-subtitle">
+            Учитывайте доходы и расходы в разных валютах, смотрите итоговый баланс и сохраняйте данные локально в браузере.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="goToCalculatorBtn" type="button">Начать расчет</button>
+            <a class="link-btn" href="#appSection">Перейти к таблице</a>
+          </div>
+        </div>
+        <div class="hero-stat-card">
+          <p class="hero-stat-value">3 валюты</p>
+          <p class="hero-stat-label">RUB, USD, EUR с автоматическим пересчетом итогов</p>
+          <div class="feature-grid">
+            <div class="feature-item">Формат сумм: 2 знака после запятой</div>
+            <div class="feature-item">Светлая и темная тема</div>
+            <div class="feature-item">Экспорт и импорт данных</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="container" id="appSection">
+    <div class="header">
+      <!-- Основной заголовок страницы -->
+      <div>
+        <h1>Калькулятор семейного бюджета</h1>
+        <p>Все суммы можно вводить в разных валютах. Итоги автоматически пересчитываются в выбранную основную валюту.</p>
+      </div>
+      <!-- Неакцентная кнопка переключения темы -->
+      <button class="btn btn-ghost" id="themeToggleBtn" type="button" title="Переключить тему" aria-label="Переключить тему">🌙</button>
+    </div>
+
+    <div class="top-controls">
+      <div class="card">
+        <!-- Объединённый блок управления валютами -->
+        <h3>Валюта</h3>
+        <div class="control-row">
+          <label for="baseCurrency">Основная валюта итогов</label>
+          <!-- Ширина выпадающего списка под самую длинную строку -->
+          <div class="currency-select-wrap">
+            <select id="baseCurrency">
+              <option value="RUB">RUB — Российский рубль</option>
+              <option value="USD">USD — Доллар США</option>
+              <option value="EUR">EUR — Евро</option>
+            </select>
+          </div>
+        </div>
+        <div class="section-note">
+          Все итоговые показатели ниже будут показаны именно в этой валюте.
+        </div>
+        <h3>Курсы валют <span class="badge">за 1 единицу валюты</span></h3>
+        <div class="section-note">
+          Укажите курс каждой валюты относительно рубля. Например: 1 USD = 90 RUB, 1 EUR = 100 RUB, 1 RUB = 1 RUB.
+        </div>
+        <div class="rate-grid">
+          <div class="rate-row">
+            <label for="rateRUB">RUB → RUB</label>
+            <input type="number" id="rateRUB" min="0" step="0.0001" placeholder="1" />
+          </div>
+          <div class="rate-row">
+            <label for="rateUSD">USD → RUB</label>
+            <input type="number" id="rateUSD" min="0" step="0.0001" placeholder="90" />
+          </div>
+          <div class="rate-row">
+            <label for="rateEUR">EUR → RUB</label>
+            <input type="number" id="rateEUR" min="0" step="0.0001" placeholder="100" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Доходы</h2>
+        <div class="section-note">Введите все ежемесячные доходы семьи.</div>
+        <div id="incomeList"></div>
+
+        <div class="add-row-box">
+          <div class="add-row-title">Добавить свой доход</div>
+          <div class="add-item-row">
+            <input type="text" id="newIncomeName" placeholder="Название дохода" />
+            <input type="text" id="newIncomeValue" inputmode="decimal" placeholder="Сумма" />
+            <select id="newIncomeCurrency">
+              <option value="RUB">RUB</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <button class="btn btn-primary btn-add-icon" id="addIncomeBtn" title="Добавить доход" aria-label="Добавить доход">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Расходы</h2>
+        <div class="section-note">Введите все ежемесячные расходы семьи.</div>
+        <div id="expenseList"></div>
+
+        <div class="add-row-box">
+          <div class="add-row-title">Добавить свой расход</div>
+          <div class="add-item-row">
+            <input type="text" id="newExpenseName" placeholder="Название расхода" />
+            <input type="text" id="newExpenseValue" inputmode="decimal" placeholder="Сумма" />
+            <select id="newExpenseCurrency">
+              <option value="RUB">RUB</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <button class="btn btn-primary btn-add-icon" id="addExpenseBtn" title="Добавить расход" aria-label="Добавить расход">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card summary-card">
+        <h2>Итоги</h2>
+
+        <div class="summary">
+          <div class="summary-box">
+            <div class="summary-title">Общий доход</div>
+            <div class="summary-value income-value" id="totalIncome">0</div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-title">Общие расходы</div>
+            <div class="summary-value expense-value" id="totalExpense">0</div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-title">Остаток / баланс</div>
+            <div class="summary-value" id="balance">0</div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-title">Норма сбережений</div>
+            <div class="summary-value" id="savingsRate">0%</div>
+            <div class="muted">Процент дохода, остающийся после расходов</div>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          Все данные автоматически сохраняются в браузере.
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-neutral" id="exportBtn">Экспорт JSON</button>
+          <button class="btn btn-neutral" id="importBtn">Импорт JSON</button>
+          <button class="btn btn-danger" id="resetBtn">Сбросить всё</button>
+          <input type="file" id="importFileInput" accept="application/json" style="display: none;" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="expenseChartSection" style="margin-top: 20px;">
+      <h2>Структура расходов</h2>
+      <div class="section-note">
+        Доли расходов отображаются после пересчёта в основную валюту.
+      </div>
+      <div id="expenseChart" class="chart-list"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
