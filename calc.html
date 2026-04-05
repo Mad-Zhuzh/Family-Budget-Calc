@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор семейного бюджета</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Neon / Tech — светлая: белый, холодный серый, металлик, контрастный синий */
+      --bg: #e9edf3;
+      --bg-mid: #dfe5ee;
+      --card: #ffffff;
+      --card-soft: #f1f3f7;
+      --text: #14181f;
+      --muted: #5c6470;
+      --line: #b4becd;
+      --primary: #0066ff;
+      --primary-deep: #004ecc;
+      --accent-violet: #5c6cff;
+      --accent-cyan: #00a8e8;
+      --accent-mint: #2db392;
+      --glow-blue: rgba(0, 102, 255, 0.24);
+      --glow-violet: rgba(92, 108, 255, 0.2);
+      --card-border: rgba(130, 150, 180, 0.38);
+      --metal-edge: rgba(255, 255, 255, 0.78);
+      --metal-shade: rgba(15, 23, 42, 0.06);
+      --focus-ring: rgba(0, 102, 255, 0.22);
+      --neon-rim: rgba(0, 102, 255, 0.14);
+      --shadow-ui: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --shadow-ui-hover: 0 8px 22px rgba(15, 23, 42, 0.08);
+      --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+      --danger: #dc2626;
+      --success: #16a34a;
+      --warning: #d97706;
+      --radius: 18px;
+    }
+
+    body[data-theme="dark"] {
+      /* Neon / Tech — тёмная: чёрный, иссиня-чёрный, металлик, контрастный синий */
+      --bg: #020408;
+      --bg-mid: #0a1018;
+      --card: #080d14;
+      --card-soft: #0c121c;
+      --text: #e6edf6;
+      --muted: #8b95a8;
+      --line: #283240;
+      --primary: #2f8fff;
+      --primary-deep: #1570e0;
+      --accent-violet: #7c8cff;
+      --accent-cyan: #4dd4ff;
+      --accent-mint: #3dd68c;
+      --glow-blue: rgba(47, 143, 255, 0.3);
+      --glow-violet: rgba(124, 140, 255, 0.26);
+      --card-border: rgba(60, 80, 110, 0.5);
+      --metal-edge: rgba(255, 255, 255, 0.09);
+      --metal-shade: rgba(0, 0, 0, 0.45);
+      --focus-ring: rgba(47, 143, 255, 0.32);
+      --neon-rim: rgba(47, 143, 255, 0.18);
+      --danger: #f87171;
+      --success: #4ade80;
+      --warning: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      background:
+        radial-gradient(ellipse 100% 55% at 50% -15%, rgba(0, 102, 255, 0.07), transparent 52%),
+        radial-gradient(ellipse 50% 40% at 100% 30%, rgba(92, 108, 255, 0.05), transparent 45%),
+        linear-gradient(175deg, #f7f8fb 0%, var(--bg) 42%, var(--bg-mid) 100%);
+      color: var(--text);
+      line-height: 1.45;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    h1,
+    h2,
+    h3,
+    .hero-title {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    body[data-theme="dark"] {
+      background:
+        radial-gradient(ellipse 90% 50% at 50% 0%, rgba(47, 143, 255, 0.1), transparent 52%),
+        radial-gradient(ellipse 45% 35% at 0% 80%, rgba(124, 140, 255, 0.06), transparent 48%),
+        linear-gradient(180deg, var(--bg-mid) 0%, var(--bg) 42%, #010204 100%);
+    }
+
+    body[data-theme="dark"] .summary-box,
+    body[data-theme="dark"] .chart-item,
+    body[data-theme="dark"] .item-row input[type="text"],
+    body[data-theme="dark"] .item-row select,
+    body[data-theme="dark"] .control-row select,
+    body[data-theme="dark"] .add-item-row input[type="text"],
+    body[data-theme="dark"] .add-item-row select,
+    body[data-theme="dark"] .rate-row input {
+      background: var(--card-soft);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    body[data-theme="dark"] .border-glow-card--panel {
+      background: linear-gradient(165deg, var(--card-soft) 0%, var(--card) 100%);
+      color: var(--text);
+      border-color: var(--card-border);
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    body[data-theme="dark"] .border-glow-inner .card {
+      color: var(--text);
+    }
+
+    body[data-theme="dark"] .summary-box {
+      box-shadow:
+        0 10px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    body[data-theme="dark"] .btn-danger {
+      background: #3f1d24;
+      color: #fecaca;
+    }
+
+    body[data-theme="dark"] .btn-neutral {
+      background: #172554;
+      color: #dbeafe;
+      border-color: #1d4ed8;
+    }
+
+    body[data-theme="dark"] .badge {
+      background: #1e293b;
+      color: #bfdbfe;
+    }
+
+    body[data-theme="dark"] .border-glow-inner .landing,
+    body[data-theme="dark"] .swap-card {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    body[data-theme="dark"] .link-btn {
+      background: var(--card-soft);
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 64px 24px;
+    }
+
+    .landing-wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 64px 0;
+    }
+
+    .border-glow-card {
+      --edge-proximity: 0;
+      --cursor-angle: 45deg;
+      --edge-sensitivity: 40;
+      --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+      --border-radius: 23px;
+      --glow-padding: 72px;
+      --cone-spread: 24;
+      --fill-opacity: 0.42;
+      --card-bg: #f2f5fa;
+
+      position: relative;
+      border-radius: var(--border-radius);
+      isolation: isolate;
+      transform: translate3d(0, 0, 0.01px);
+      display: grid;
+      border: 1px solid rgba(130, 150, 180, 0.35);
+      background: linear-gradient(165deg, #ffffff 0%, #f0f3f8 55%, #e8ecf2 100%);
+      overflow: visible;
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+      margin-bottom: 36px;
+    }
+
+    body[data-theme="dark"] .border-glow-card {
+      --card-bg: #0c121c;
+      border-color: rgba(60, 80, 110, 0.45);
+      background: linear-gradient(165deg, #0c121c 0%, #080c14 50%, #05080c 100%);
+      box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.55),
+        0 0 0 1px var(--neon-rim),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    .border-glow-card::before,
+    .border-glow-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      transition: opacity 0.25s ease-out;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .border-glow-card:not(:hover):not(.sweep-active)::before,
+    .border-glow-card:not(:hover):not(.sweep-active)::after,
+    .border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
+      opacity: 0;
+      transition: opacity 0.75s ease-in-out;
+    }
+
+    .border-glow-card::before {
+      border: 1px solid transparent;
+      background:
+        linear-gradient(var(--card-bg, #f2f5fa) 0 100%) padding-box,
+        linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+        var(--gradient-one) border-box,
+        var(--gradient-two) border-box,
+        var(--gradient-three) border-box,
+        var(--gradient-four) border-box,
+        var(--gradient-five) border-box,
+        var(--gradient-six) border-box,
+        var(--gradient-seven) border-box,
+        var(--gradient-base) border-box;
+
+      opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+
+      -webkit-mask-image: conic-gradient(
+        from var(--cursor-angle) at center,
+        black calc(var(--cone-spread) * 1%),
+        transparent calc((var(--cone-spread) + 15) * 1%),
+        transparent calc((100 - var(--cone-spread) - 15) * 1%),
+        black calc((100 - var(--cone-spread)) * 1%)
+      );
+      mask-image: conic-gradient(
+        from var(--cursor-angle) at center,
+        black calc(var(--cone-spread) * 1%),
+        transparent calc((var(--cone-spread) + 15) * 1%),
+        transparent calc((100 - var(--cone-spread) - 15) * 1%),
+        black calc((100 - var(--cone-spread)) * 1%)
+      );
+    }
+
+    .border-glow-card::after {
+      border: 1px solid transparent;
+      background:
+        var(--gradient-one) padding-box,
+        var(--gradient-two) padding-box,
+        var(--gradient-three) padding-box,
+        var(--gradient-four) padding-box,
+        var(--gradient-five) padding-box,
+        var(--gradient-six) padding-box,
+        var(--gradient-seven) padding-box,
+        var(--gradient-base) padding-box;
+
+      -webkit-mask-image:
+        linear-gradient(to bottom, black, black),
+        radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+        radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+        conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+      mask-image:
+        linear-gradient(to bottom, black, black),
+        radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+        radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+        radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+        conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+
+      -webkit-mask-composite: source-out, source-over, source-over, source-over, source-over, source-over;
+      mask-composite: subtract, add, add, add, add, add;
+      opacity: calc(var(--fill-opacity, 0.5) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+      mix-blend-mode: soft-light;
+    }
+
+    .border-glow-card > .edge-light {
+      position: absolute;
+      inset: calc(var(--glow-padding) * -1);
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 1;
+
+      -webkit-mask-image: conic-gradient(
+        from var(--cursor-angle) at center,
+        black 2.5%,
+        transparent 10%,
+        transparent 90%,
+        black 97.5%
+      );
+      mask-image: conic-gradient(
+        from var(--cursor-angle) at center,
+        black 2.5%,
+        transparent 10%,
+        transparent 90%,
+        black 97.5%
+      );
+
+      opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+      mix-blend-mode: plus-lighter;
+      transition: opacity 0.25s ease-out;
+    }
+
+    .border-glow-card > .edge-light::before {
+      content: "";
+      position: absolute;
+      inset: var(--glow-padding);
+      border-radius: inherit;
+      box-shadow:
+        inset 0 0 0 1px var(--glow-color, hsl(210deg 85% 72% / 100%)),
+        inset 0 0 1px 0 var(--glow-color-60),
+        inset 0 0 3px 0 var(--glow-color-50),
+        inset 0 0 6px 0 var(--glow-color-40),
+        inset 0 0 15px 0 var(--glow-color-30),
+        inset 0 0 25px 2px var(--glow-color-20),
+        inset 0 0 50px 2px var(--glow-color-10),
+        0 0 1px 0 var(--glow-color-60),
+        0 0 3px 0 var(--glow-color-50),
+        0 0 6px 0 var(--glow-color-40),
+        0 0 15px 0 var(--glow-color-30),
+        0 0 25px 2px var(--glow-color-20),
+        0 0 50px 2px var(--glow-color-10);
+    }
+
+    .border-glow-inner {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: visible;
+      z-index: 3;
+      border-radius: inherit;
+    }
+
+    .border-glow-inner .landing,
+    .border-glow-inner .card {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: inherit;
+      margin-bottom: 0;
+    }
+
+    /* только вложенный «Остаток / баланс» — без второй рамки поверх glow */
+    .border-glow-inner .summary-box--balance-inner {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: inherit;
+      margin-bottom: 0;
+      flex: 1;
+      min-height: 0;
+    }
+
+    body[data-theme="dark"] .border-glow-inner .summary-box--balance-inner {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* Остаток / баланс — отдельный компактный Border Glow, сильнее свечение */
+    .border-glow-card--balance {
+      --border-radius: 16px;
+      --glow-padding: 40px;
+      --edge-sensitivity: 32;
+      --cone-spread: 26;
+      display: flex;
+      flex-direction: column;
+      align-self: stretch;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      margin: 0;
+      background: linear-gradient(145deg, var(--card) 0%, var(--card-soft) 100%);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+    }
+
+    .border-glow-card--balance > .border-glow-inner {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body[data-theme="dark"] .border-glow-card--balance {
+      background: linear-gradient(145deg, var(--card-soft) 0%, var(--card) 100%);
+      border-color: var(--line);
+      box-shadow:
+        0 10px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    .border-glow-card--panel {
+      --border-radius: var(--radius);
+      --glow-padding: 52px;
+      --cone-spread: 22;
+      --fill-opacity: 0.38;
+      background: linear-gradient(165deg, var(--card) 0%, var(--card-soft) 100%);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+      margin-bottom: 0;
+      transition: box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .border-glow-card--panel:hover {
+      box-shadow: var(--shadow-ui-hover), var(--shadow-inset);
+      border-color: rgba(0, 102, 255, 0.2);
+    }
+
+    body[data-theme="dark"] .border-glow-card--panel:hover {
+      box-shadow:
+        0 18px 48px rgba(0, 0, 0, 0.55),
+        0 0 0 1px var(--neon-rim),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    .border-glow-chart {
+      margin-top: 20px;
+    }
+
+    .landing {
+      padding: 26px;
+    }
+
+    .landing-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 78px;
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      position: relative;
+      opacity: 0.95;
+      text-shadow: 0 0 20px rgba(0, 102, 255, 0.12);
+    }
+
+    .landing-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 13px;
+      line-height: 1.2;
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        color 0.22s ease;
+    }
+
+    .link-btn:hover {
+      color: var(--text);
+      border-color: rgba(0, 102, 255, 0.35);
+      background: rgba(0, 102, 255, 0.04);
+      box-shadow: none;
+    }
+
+    body[data-theme="dark"] .link-btn:hover {
+      color: var(--text);
+      border-color: rgba(47, 143, 255, 0.45);
+      background: rgba(47, 143, 255, 0.08);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .hero-title {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat-card {
+      position: relative;
+      background: linear-gradient(145deg, #ffffff 0%, #f4f6fa 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+    }
+
+    body[data-theme="dark"] .hero-stat-card {
+      background: linear-gradient(145deg, var(--card-soft) 0%, var(--card) 100%);
+      border-color: var(--line);
+      color: var(--text);
+      box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    /* Без светлой подложки; чуть выше общей середины колонки */
+    .hero-stat-card.hero-stat-card--swap {
+      min-height: 280px;
+      overflow: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: -62px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    body[data-theme="dark"] .hero-stat-card.hero-stat-card--swap {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .card-swap-container {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      height: 220px;
+      margin: 0 auto;
+      perspective: 900px;
+      overflow: visible;
+      transform-origin: center center;
+    }
+
+    .swap-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(100%, 280px);
+      min-height: 130px;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #eef1f6);
+      box-shadow: var(--shadow-ui), inset 0 1px 0 var(--metal-edge);
+      transform-style: preserve-3d;
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    body[data-theme="dark"] .swap-card {
+      background: linear-gradient(180deg, #101820, #0c1218);
+      box-shadow: inset 0 1px 0 var(--metal-edge);
+    }
+
+    .swap-card__title {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .swap-card__text {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .card-swap-container {
+        transform: scale(0.85);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card-swap-container {
+        transform: scale(0.72);
+      }
+    }
+
+    .header {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    /* Как у текста внутри .card (padding 20px) */
+    .header > div:first-child {
+      padding-left: 20px;
+    }
+
+    .header .page-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .top-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .card {
+      position: relative;
+      background: linear-gradient(165deg, var(--card) 0%, var(--card-soft) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+      padding: 20px;
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .border-glow-inner .card {
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .section-note {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    body[data-theme="dark"] .section-note {
+      color: var(--muted);
+    }
+
+    .summary-title,
+    .section-note,
+    .muted,
+    .footer-note {
+      font-weight: 500;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 1fr 140px 110px auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 6px 8px;
+      border-radius: 14px;
+      transition: background 0.18s ease;
+    }
+
+    .item-row:hover {
+      background: rgba(0, 102, 255, 0.05);
+    }
+
+    body[data-theme="dark"] .item-row:hover {
+      background: rgba(47, 143, 255, 0.09);
+    }
+
+    .add-item-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 2fr) minmax(140px, 160px) minmax(100px, 120px) 54px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .item-row label {
+      font-weight: 600;
+    }
+
+    .item-row input[type="number"],
+    .item-row input[type="text"],
+    .item-row select,
+    .control-row select,
+    .add-item-row input[type="number"],
+    .add-item-row input[type="text"],
+    .add-item-row select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    /* Поля с суммами выравниваются по правому краю */
+    .item-row input[type="text"],
+    .add-item-row input[type="text"] {
+      text-align: right;
+    }
+
+    .item-row input:focus,
+    .item-row select:focus,
+    .control-row select:focus,
+    .rate-row input:focus,
+    .add-item-row input:focus,
+    .add-item-row select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease,
+        color 0.22s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: none;
+    }
+
+    /* Hover остаётся акцентным: темнее/насыщеннее синий, белый текст — не как вторичная link-btn */
+    .btn-primary:hover {
+      color: #fff;
+      background: var(--primary-deep);
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 4px 16px rgba(0, 102, 255, 0.32);
+    }
+
+    body[data-theme="dark"] .btn-primary:hover {
+      color: #fff;
+      background: #4da3ff;
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(47, 143, 255, 0.38);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .btn-neutral {
+      background: linear-gradient(180deg, #f2f5fa, #e4eaf2);
+      color: #0c2a5c;
+      border: 1px solid rgba(0, 102, 255, 0.22);
+    }
+
+    .btn-small {
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-add-icon {
+      min-width: 54px;
+      padding: 11px 0;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-box {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: linear-gradient(145deg, var(--card) 0%, var(--card-soft) 100%);
+      box-shadow: var(--shadow-ui), var(--shadow-inset);
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .summary-title {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    #balance {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .income-value {
+      color: var(--primary);
+    }
+
+    .expense-value {
+      color: var(--danger);
+    }
+
+    .balance-positive {
+      color: var(--primary);
+    }
+
+    .balance-negative {
+      color: var(--danger);
+    }
+
+    .balance-zero {
+      color: var(--warning);
+    }
+
+    .add-row-box {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--line);
+    }
+
+    .add-row-title {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .chart-list {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .chart-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff, #eef2f8);
+      box-shadow: inset 0 1px 0 var(--metal-edge);
+      transition:
+        box-shadow 0.22s ease,
+        border-color 0.22s ease,
+        background 0.22s ease;
+    }
+
+    .chart-item:hover {
+      border-color: rgba(0, 102, 255, 0.18);
+    }
+
+    body[data-theme="dark"] .chart-item {
+      background: linear-gradient(180deg, #0c121c, #080c12);
+      box-shadow: inset 0 1px 0 var(--metal-edge);
+    }
+
+    body[data-theme="dark"] .chart-item:hover {
+      border-color: rgba(47, 143, 255, 0.28);
+    }
+
+    /* Структура расходов: строки без видимой рамки */
+    #expenseChart .chart-item {
+      border: none;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    #expenseChart .chart-item:hover {
+      border: none;
+      background: rgba(0, 102, 255, 0.04);
+    }
+
+    body[data-theme="dark"] #expenseChart .chart-item {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    body[data-theme="dark"] #expenseChart .chart-item:hover {
+      border: none;
+      background: rgba(47, 143, 255, 0.07);
+    }
+
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .bar-track {
+      width: 100%;
+      height: 12px;
+      background: linear-gradient(180deg, #d5dce6, #eef2f7);
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px var(--metal-shade);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        var(--accent-cyan) 0%,
+        var(--accent-violet) 38%,
+        var(--primary) 72%,
+        var(--primary-deep) 100%
+      );
+      width: 0%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow:
+        0 0 16px var(--glow-blue),
+        0 0 28px var(--glow-violet);
+    }
+
+    body[data-theme="dark"] .bar-track {
+      background: linear-gradient(180deg, #060a10, #121a24);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    body[data-theme="dark"] .bar-fill {
+      box-shadow:
+        0 0 20px var(--glow-blue),
+        0 0 34px var(--glow-violet);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .remove-btn {
+      min-width: 42px;
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .control-row label {
+      font-weight: 700;
+    }
+
+    .currency-select-wrap {
+      width: fit-content;
+      min-width: 320px;
+      max-width: 100%;
+    }
+
+    .currency-select-wrap select {
+      width: auto;
+      min-width: 100%;
+      display: inline-block;
+    }
+
+    .rate-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .rate-row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .rate-row label {
+      width: 110px;
+      flex: 0 0 110px;
+    }
+
+    .rate-row input {
+      width: 160px;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      outline: none;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #eef3f9, #e2eaf4);
+      border: 1px solid rgba(0, 102, 255, 0.18);
+      color: #0d3a8a;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: 6px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    @media (min-width: 1200px) {
+      .container {
+        max-width: 1400px;
+        padding: 48px 84px 24px;
+      }
+
+      .landing-wrap {
+        max-width: 1400px;
+        padding: 24px 84px 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .grid > .border-glow-card.summary-card {
+        grid-column: 1 / -1;
+      }
+
+      .summary {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .grid,
+      .top-controls {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .brand {
+        font-size: 52px;
+        line-height: 1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .brand {
+        font-size: 40px;
+        letter-spacing: -0.03em;
+      }
+
+      .landing-wrap {
+        padding: 20px 20px 0;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-stat-card.hero-stat-card--swap {
+        margin-top: 0;
+      }
+
+      .item-row,
+      .add-item-row {
+        grid-template-columns: 1fr;
+      }
+
+      .control-row,
+      .rate-row {
+        grid-template-columns: 1fr;
+      }
+
+      .rate-row {
+        display: grid;
+      }
+
+      .rate-row label,
+      .rate-row input {
+        width: 100%;
+        flex: none;
+      }
+
+      .summary-value {
+        font-size: 24px;
+      }
+
+      .hero-title {
+        font-size: 26px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-wrap">
+    <div class="border-glow-card" id="landingBorderGlow">
+      <span class="edge-light" aria-hidden="true"></span>
+      <div class="border-glow-inner">
+    <!-- Приветственный мини-лендинг -->
+    <section class="landing bento-section" id="landingHero">
+      <div class="landing-nav">
+        <div class="brand">FamilyBudget</div>
+        <div class="landing-links">
+          <a class="link-btn" href="#appSection">Калькулятор</a>
+          <a class="link-btn" href="#expenseChartSection">График расходов</a>
+        </div>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h1 class="hero-title">Планируйте семейный бюджет в&nbsp;одном месте</h1>
+          <p class="hero-subtitle">
+            Учитывайте доходы и&nbsp;расходы в&nbsp;разных валютах, смотрите итоговый баланс и&nbsp;сохраняйте данные локально в&nbsp;браузере.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="goToCalculatorBtn" type="button">Начать расчет</button>
+            <a class="link-btn" href="#appSection">Перейти к&nbsp;таблице</a>
+          </div>
+        </div>
+        <div class="hero-stat-card hero-stat-card--swap">
+          <div class="card-swap-container" id="heroCardSwap" aria-live="polite">
+            <div class="swap-card">
+              <h3 class="swap-card__title">3 валюты</h3>
+              <p class="swap-card__text">RUB · USD · EUR — учёт в&nbsp;разных валютах с&nbsp;курсами.</p>
+            </div>
+            <div class="swap-card">
+              <h3 class="swap-card__title">Темы</h3>
+              <p class="swap-card__text">Светлая и&nbsp;тёмная темы под&nbsp;ваш экран и&nbsp;время суток.</p>
+            </div>
+            <div class="swap-card">
+              <h3 class="swap-card__title">Данные</h3>
+              <p class="swap-card__text">Экспорт и&nbsp;импорт — резервная копия прямо из&nbsp;браузера.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" id="appSection">
+    <div class="header">
+      <!-- Основной заголовок страницы -->
+      <div>
+        <h2 class="page-title">Калькулятор семейного бюджета</h2>
+        <p>Все суммы можно вводить в&nbsp;разных валютах. Итоги автоматически пересчитываются в&nbsp;выбранную основную валюту.</p>
+      </div>
+      <!-- Неакцентная кнопка переключения темы -->
+      <button class="btn btn-ghost" id="themeToggleBtn" type="button" title="Переключить тему" aria-label="Переключить тему">🌙</button>
+    </div>
+
+    <div class="top-controls">
+      <div class="border-glow-card border-glow-card--panel" id="borderGlowTopControls">
+        <span class="edge-light" aria-hidden="true"></span>
+        <div class="border-glow-inner">
+      <div class="card">
+        <!-- Объединённый блок управления валютами -->
+        <h3>Валюта</h3>
+        <div class="control-row">
+          <label for="baseCurrency">Основная валюта итогов</label>
+          <!-- Ширина выпадающего списка под самую длинную строку -->
+          <div class="currency-select-wrap">
+            <select id="baseCurrency">
+              <option value="RUB">RUB — Российский рубль</option>
+              <option value="USD">USD — Доллар США</option>
+              <option value="EUR">EUR — Евро</option>
+            </select>
+          </div>
+        </div>
+        <div class="section-note">
+          Все итоговые показатели ниже будут показаны именно в&nbsp;этой валюте.
+        </div>
+        <h3>Курсы валют <span class="badge">за&nbsp;1 единицу валюты</span></h3>
+        <div class="section-note">
+          Укажите курс каждой валюты относительно&nbsp;рубля. Например: 1 USD = 90 RUB, 1 EUR = 100 RUB, 1 RUB = 1 RUB.
+        </div>
+        <div class="rate-grid">
+          <div class="rate-row">
+            <label for="rateRUB">RUB → RUB</label>
+            <input type="number" id="rateRUB" min="0" step="0.0001" placeholder="1" />
+          </div>
+          <div class="rate-row">
+            <label for="rateUSD">USD → RUB</label>
+            <input type="number" id="rateUSD" min="0" step="0.0001" placeholder="90" />
+          </div>
+          <div class="rate-row">
+            <label for="rateEUR">EUR → RUB</label>
+            <input type="number" id="rateEUR" min="0" step="0.0001" placeholder="100" />
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="border-glow-card border-glow-card--panel" id="borderGlowIncome">
+        <span class="edge-light" aria-hidden="true"></span>
+        <div class="border-glow-inner">
+      <div class="card">
+        <h2>Доходы</h2>
+        <div class="section-note">Введите все ежемесячные доходы семьи.</div>
+        <div id="incomeList"></div>
+
+        <div class="add-row-box">
+          <div class="add-row-title">Добавить свой доход</div>
+          <div class="add-item-row">
+            <input type="text" id="newIncomeName" placeholder="Название дохода" />
+            <input type="text" id="newIncomeValue" inputmode="decimal" placeholder="Сумма" />
+            <select id="newIncomeCurrency">
+              <option value="RUB">RUB</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <button class="btn btn-primary btn-add-icon" id="addIncomeBtn" title="Добавить доход" aria-label="Добавить доход">+</button>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+      <div class="border-glow-card border-glow-card--panel" id="borderGlowExpense">
+        <span class="edge-light" aria-hidden="true"></span>
+        <div class="border-glow-inner">
+      <div class="card">
+        <h2>Расходы</h2>
+        <div class="section-note">Введите все ежемесячные расходы семьи.</div>
+        <div id="expenseList"></div>
+
+        <div class="add-row-box">
+          <div class="add-row-title">Добавить свой расход</div>
+          <div class="add-item-row">
+            <input type="text" id="newExpenseName" placeholder="Название расхода" />
+            <input type="text" id="newExpenseValue" inputmode="decimal" placeholder="Сумма" />
+            <select id="newExpenseCurrency">
+              <option value="RUB">RUB</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+            </select>
+            <button class="btn btn-primary btn-add-icon" id="addExpenseBtn" title="Добавить расход" aria-label="Добавить расход">+</button>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+      <div class="border-glow-card border-glow-card--panel summary-card" id="borderGlowSummary">
+        <span class="edge-light" aria-hidden="true"></span>
+        <div class="border-glow-inner">
+      <div class="card">
+        <h2>Итоги</h2>
+
+        <div class="summary">
+          <div class="summary-box">
+            <div class="summary-title">Общий доход</div>
+            <div class="summary-value income-value" id="totalIncome">0</div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-title">Общие расходы</div>
+            <div class="summary-value expense-value" id="totalExpense">0</div>
+          </div>
+
+          <div class="border-glow-card border-glow-card--balance" id="borderGlowBalance">
+            <span class="edge-light" aria-hidden="true"></span>
+            <div class="border-glow-inner">
+              <div class="summary-box summary-box--balance-inner">
+                <div class="summary-title">Остаток / баланс</div>
+                <div class="summary-value" id="balance">0</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-title">Норма сбережений</div>
+            <div class="summary-value" id="savingsRate">0%</div>
+            <div class="muted">Процент дохода, остающийся после&nbsp;расходов</div>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          Все данные автоматически сохраняются в&nbsp;браузере.
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-neutral" id="exportBtn">Экспорт JSON</button>
+          <button class="btn btn-neutral" id="importBtn">Импорт JSON</button>
+          <button class="btn btn-danger" id="resetBtn">Сбросить всё</button>
+          <input type="file" id="importFileInput" accept="application/json" style="display: none;" />
+        </div>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="border-glow-card border-glow-card--panel border-glow-chart" id="borderGlowChart">
+      <span class="edge-light" aria-hidden="true"></span>
+      <div class="border-glow-inner">
+    <div class="card" id="expenseChartSection">
+      <h2>Структура расходов</h2>
+      <div class="section-note">
+        Доли расходов отображаются после&nbsp;пересчёта в&nbsp;основную валюту.
+      </div>
+      <div id="expenseChart" class="chart-list"></div>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const STORAGE_KEY = "family_budget_calculator_multi_currency_v4";
+    const CURRENCIES = ["RUB", "USD", "EUR"];
+    const THEME_KEY = "family_budget_theme_v1";
+
+    function generateId() {
+      return "id-" + Math.random().toString(36).slice(2, 11);
+    }
+
+    function toNumber(value) {
+      const normalized = String(value ?? "").replace(",", ".");
+      const num = parseFloat(normalized);
+      return isNaN(num) || num < 0 ? 0 : num;
+    }
+
+    function numberToInputValue(value) {
+      return Number(value) === 0 ? "" : String(value);
+    }
+
+    function numberToAmountInputValue(value) {
+      return Number(value) === 0 ? "" : Number(value).toFixed(2).replace(".", ",");
+    }
+
+    function normalizeAmountFieldValue(rawValue) {
+      const value = String(rawValue ?? "").trim();
+      if (!value) return "";
+      return toNumber(value).toFixed(2).replace(".", ",");
+    }
+
+    function setTheme(theme) {
+      const isDark = theme === "dark";
+      document.body.setAttribute("data-theme", isDark ? "dark" : "light");
+      themeToggleBtn.textContent = isDark ? "☀" : "🌙";
+      localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+      if (typeof window.applyBorderGlowTheme === "function") {
+        window.applyBorderGlowTheme();
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      setTheme(savedTheme === "dark" ? "dark" : "light");
+    }
+
+    /** BorderGlow (@react-bits) → vanilla: верхний блок лендинга */
+    const BORDER_GRADIENT_POSITIONS = [
+      "80% 55%",
+      "69% 34%",
+      "8% 6%",
+      "41% 38%",
+      "86% 85%",
+      "82% 18%",
+      "51% 4%"
+    ];
+    const BORDER_GRADIENT_KEYS = [
+      "--gradient-one",
+      "--gradient-two",
+      "--gradient-three",
+      "--gradient-four",
+      "--gradient-five",
+      "--gradient-six",
+      "--gradient-seven"
+    ];
+    const BORDER_COLOR_MAP = [0, 1, 2, 0, 1, 2, 1];
+
+    function borderGlowParseHSL(hslStr) {
+      const match = String(hslStr).match(/([\d.]+)\s*([\d.]+)%?\s*([\d.]+)%?/);
+      if (!match) return { h: 210, s: 85, l: 72 };
+      return { h: parseFloat(match[1]), s: parseFloat(match[2]), l: parseFloat(match[3]) };
+    }
+
+    function borderGlowBuildGlowVars(glowColor, intensity) {
+      const { h, s, l } = borderGlowParseHSL(glowColor);
+      const base = `${h}deg ${s}% ${l}%`;
+      const opacities = [100, 60, 50, 40, 30, 20, 10];
+      const keys = ["", "-60", "-50", "-40", "-30", "-20", "-10"];
+      const vars = {};
+      for (let i = 0; i < opacities.length; i++) {
+        vars[`--glow-color${keys[i]}`] = `hsl(${base} / ${Math.min(opacities[i] * intensity, 100)}%)`;
+      }
+      return vars;
+    }
+
+    function borderGlowBuildGradientVars(colors) {
+      const vars = {};
+      for (let i = 0; i < 7; i++) {
+        const c = colors[Math.min(BORDER_COLOR_MAP[i], colors.length - 1)];
+        vars[BORDER_GRADIENT_KEYS[i]] = `radial-gradient(at ${BORDER_GRADIENT_POSITIONS[i]}, ${c} 0px, transparent 50%)`;
+      }
+      vars["--gradient-base"] = `linear-gradient(${colors[0]} 0 100%)`;
+      return vars;
+    }
+
+    function easeOutCubicBorder(x) {
+      return 1 - Math.pow(1 - x, 3);
+    }
+    function easeInCubicBorder(x) {
+      return x * x * x;
+    }
+
+    function borderGlowAnimateValue({
+      start = 0,
+      end = 100,
+      duration = 1000,
+      delay = 0,
+      ease = easeOutCubicBorder,
+      onUpdate,
+      onEnd
+    }) {
+      setTimeout(() => {
+        const t0 = performance.now();
+        function tick() {
+          const elapsed = performance.now() - t0;
+          const t = Math.min(elapsed / duration, 1);
+          onUpdate(start + (end - start) * ease(t));
+          if (t < 1) requestAnimationFrame(tick);
+          else if (onEnd) onEnd();
+        }
+        requestAnimationFrame(tick);
+      }, delay);
+    }
+
+    function borderGlowGetCenterOfElement(el) {
+      const { width, height } = el.getBoundingClientRect();
+      return [width / 2, height / 2];
+    }
+
+    function borderGlowGetEdgeProximity(el, x, y) {
+      const [cx, cy] = borderGlowGetCenterOfElement(el);
+      const dx = x - cx;
+      const dy = y - cy;
+      let kx = Infinity;
+      let ky = Infinity;
+      if (dx !== 0) kx = cx / Math.abs(dx);
+      if (dy !== 0) ky = cy / Math.abs(dy);
+      return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+    }
+
+    function borderGlowGetCursorAngle(el, x, y) {
+      const [cx, cy] = borderGlowGetCenterOfElement(el);
+      const dx = x - cx;
+      const dy = y - cy;
+      if (dx === 0 && dy === 0) return 0;
+      const radians = Math.atan2(dy, dx);
+      let degrees = radians * (180 / Math.PI) + 90;
+      if (degrees < 0) degrees += 360;
+      return degrees;
+    }
+
+    function applyBorderGlowThemeToCard(card) {
+      const isDark = document.body.getAttribute("data-theme") === "dark";
+      const isBalance = card.classList.contains("border-glow-card--balance");
+      const isPanel = card.classList.contains("border-glow-card--panel");
+
+      let colors = isDark
+        ? ["#38bdf8", "#a78bfa", "#60a5fa"]
+        : ["#60a5fa", "#818cf8", "#38bdf8"];
+      let glowColor = isDark ? "210 70 68" : "210 85 72";
+      let glowIntensity = 0.6;
+
+      if (isBalance) {
+        glowIntensity = 0.88;
+        colors = isDark
+          ? ["#4ade80", "#38bdf8", "#c084fc"]
+          : ["#22d3ee", "#60a5fa", "#a78bfa"];
+        glowColor = isDark ? "200 78 74" : "218 92 76";
+      }
+
+      Object.entries(borderGlowBuildGlowVars(glowColor, glowIntensity)).forEach(([k, v]) => {
+        card.style.setProperty(k, v);
+      });
+      Object.entries(borderGlowBuildGradientVars(colors)).forEach(([k, v]) => {
+        card.style.setProperty(k, v);
+      });
+
+      if (isBalance) {
+        card.style.setProperty("--card-bg", isDark ? "#0e1622" : "#eef3fb");
+        card.style.setProperty("--fill-opacity", isDark ? "0.48" : "0.55");
+      } else {
+        card.style.setProperty("--card-bg", isDark ? "#0c121c" : "#eef2f6");
+        card.style.setProperty(
+          "--fill-opacity",
+          isDark ? (isPanel ? "0.3" : "0.38") : isPanel ? "0.34" : "0.42"
+        );
+      }
+    }
+
+    function bindBorderGlowCard(card, runSweep) {
+      function handlePointerMove(e) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const edge = borderGlowGetEdgeProximity(card, x, y);
+        const angle = borderGlowGetCursorAngle(card, x, y);
+        card.style.setProperty("--edge-proximity", `${(edge * 100).toFixed(3)}`);
+        card.style.setProperty("--cursor-angle", `${angle.toFixed(3)}deg`);
+      }
+
+      card.addEventListener("pointermove", handlePointerMove);
+
+      if (!runSweep || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const angleStart = 110;
+      const angleEnd = 465;
+      card.classList.add("sweep-active");
+      card.style.setProperty("--cursor-angle", `${angleStart}deg`);
+
+      borderGlowAnimateValue({
+        duration: 500,
+        onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v))
+      });
+      borderGlowAnimateValue({
+        ease: easeInCubicBorder,
+        duration: 1500,
+        end: 50,
+        onUpdate: (v) => {
+          card.style.setProperty("--cursor-angle", `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+        }
+      });
+      borderGlowAnimateValue({
+        ease: easeOutCubicBorder,
+        delay: 1500,
+        duration: 2250,
+        start: 50,
+        end: 100,
+        onUpdate: (v) => {
+          card.style.setProperty("--cursor-angle", `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+        }
+      });
+      borderGlowAnimateValue({
+        ease: easeInCubicBorder,
+        delay: 2500,
+        duration: 1500,
+        start: 100,
+        end: 0,
+        onUpdate: (v) => card.style.setProperty("--edge-proximity", String(v)),
+        onEnd: () => card.classList.remove("sweep-active")
+      });
+    }
+
+    function initBorderGlows() {
+      document.querySelectorAll(".border-glow-card").forEach((card) => {
+        applyBorderGlowThemeToCard(card);
+        bindBorderGlowCard(card, card.id === "landingBorderGlow");
+      });
+      window.applyBorderGlowTheme = function () {
+        document.querySelectorAll(".border-glow-card").forEach(applyBorderGlowThemeToCard);
+      };
+    }
+
+    /**
+     * Card Swap (аналог React CardSwap): три карточки в стопке.
+     */
+    function initHeroCardSwap() {
+      if (typeof gsap === "undefined") return;
+      const container = document.getElementById("heroCardSwap");
+      if (!container) return;
+      const cards = container.querySelectorAll(".swap-card");
+      if (!cards.length) return;
+
+      const cardDistance = 60;
+      const verticalDistance = 70;
+      const delayMs = 3800;
+      let active = 0;
+
+      function layout() {
+        const n = cards.length;
+        cards.forEach((el, i) => {
+          const depth = (i - active + n * 10) % n;
+          const ox = depth * (cardDistance / 2);
+          const oy = depth * (verticalDistance / 2);
+          gsap.to(el, {
+            xPercent: -50,
+            yPercent: -50,
+            x: ox,
+            y: oy,
+            scale: 1 - depth * 0.045,
+            opacity: Math.max(0.52, 1 - depth * 0.2),
+            zIndex: 20 - depth,
+            duration: 0.65,
+            ease: "power2.out"
+          });
+        });
+      }
+
+      gsap.set(cards, {
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        transformOrigin: "center center"
+      });
+
+      layout();
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      window.setInterval(() => {
+        active = (active + 1) % cards.length;
+        layout();
+      }, delayMs);
+    }
+
+    function getDefaultState() {
+      return {
+        baseCurrency: "RUB",
+        exchangeRatesToRUB: {
+          RUB: 1,
+          USD: 90,
+          EUR: 100
+        },
+        incomes: [
+          { id: generateId(), name: "Зарплата 1", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Зарплата 2", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Подработка", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Пособия / выплаты", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Прочие доходы", amount: 0, currency: "RUB", custom: false }
+        ],
+        expenses: [
+          { id: generateId(), name: "Жильё / аренда / ипотека", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Коммунальные услуги", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Продукты", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Транспорт", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Связь / интернет", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Дети", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Здоровье / лекарства", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Кредиты", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Развлечения", amount: 0, currency: "RUB", custom: false },
+          { id: generateId(), name: "Прочие расходы", amount: 0, currency: "RUB", custom: false }
+        ]
+      };
+    }
+
+    function normalizeLoadedState(parsed) {
+      const fallback = getDefaultState();
+
+      return {
+        baseCurrency: parsed.baseCurrency || fallback.baseCurrency,
+        exchangeRatesToRUB: {
+          RUB: toNumber(parsed.exchangeRatesToRUB?.RUB) || 1,
+          USD: toNumber(parsed.exchangeRatesToRUB?.USD) || 90,
+          EUR: toNumber(parsed.exchangeRatesToRUB?.EUR) || 100
+        },
+        incomes: Array.isArray(parsed.incomes) ? parsed.incomes.map(item => ({
+          id: item.id || generateId(),
+          name: item.name || "Без названия",
+          amount: toNumber(item.amount),
+          currency: CURRENCIES.includes(item.currency) ? item.currency : "RUB",
+          custom: Boolean(item.custom)
+        })) : fallback.incomes,
+        expenses: Array.isArray(parsed.expenses) ? parsed.expenses.map(item => ({
+          id: item.id || generateId(),
+          name: item.name || "Без названия",
+          amount: toNumber(item.amount),
+          currency: CURRENCIES.includes(item.currency) ? item.currency : "RUB",
+          custom: Boolean(item.custom)
+        })) : fallback.expenses
+      };
+    }
+
+    function loadData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return getDefaultState();
+        return normalizeLoadedState(JSON.parse(raw));
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+        return getDefaultState();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatCurrency(value, currency) {
+      const localeMap = {
+        RUB: "ru-RU",
+        USD: "en-US",
+        EUR: "de-DE"
+      };
+
+      return new Intl.NumberFormat(localeMap[currency] || "ru-RU", {
+        style: "currency",
+        currency: currency,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function convertToRUB(amount, sourceCurrency) {
+      const rate = toNumber(state.exchangeRatesToRUB[sourceCurrency]);
+      if (!rate) return 0;
+      return amount * rate;
+    }
+
+    function convertFromRUB(amountRUB, targetCurrency) {
+      const rate = toNumber(state.exchangeRatesToRUB[targetCurrency]);
+      if (!rate) return 0;
+      return amountRUB / rate;
+    }
+
+    function convertCurrency(amount, sourceCurrency, targetCurrency) {
+      if (sourceCurrency === targetCurrency) return amount;
+      const amountRUB = convertToRUB(amount, sourceCurrency);
+      return convertFromRUB(amountRUB, targetCurrency);
+    }
+
+    function getAmountInBaseCurrency(item) {
+      return convertCurrency(toNumber(item.amount), item.currency, state.baseCurrency);
+    }
+
+    function getTotalIncome() {
+      return state.incomes.reduce((sum, item) => sum + getAmountInBaseCurrency(item), 0);
+    }
+
+    function getTotalExpense() {
+      return state.expenses.reduce((sum, item) => sum + getAmountInBaseCurrency(item), 0);
+    }
+
+    let state = loadData();
+
+    const incomeListEl = document.getElementById("incomeList");
+    const expenseListEl = document.getElementById("expenseList");
+    const totalIncomeEl = document.getElementById("totalIncome");
+    const totalExpenseEl = document.getElementById("totalExpense");
+    const balanceEl = document.getElementById("balance");
+    const savingsRateEl = document.getElementById("savingsRate");
+    const expenseChartEl = document.getElementById("expenseChart");
+
+    const baseCurrencyEl = document.getElementById("baseCurrency");
+    const rateRUBEl = document.getElementById("rateRUB");
+    const rateUSDEl = document.getElementById("rateUSD");
+    const rateEUREl = document.getElementById("rateEUR");
+
+    const newIncomeNameEl = document.getElementById("newIncomeName");
+    const newIncomeValueEl = document.getElementById("newIncomeValue");
+    const newIncomeCurrencyEl = document.getElementById("newIncomeCurrency");
+
+    const newExpenseNameEl = document.getElementById("newExpenseName");
+    const newExpenseValueEl = document.getElementById("newExpenseValue");
+    const newExpenseCurrencyEl = document.getElementById("newExpenseCurrency");
+
+    const addIncomeBtn = document.getElementById("addIncomeBtn");
+    const addExpenseBtn = document.getElementById("addExpenseBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const importBtn = document.getElementById("importBtn");
+    const importFileInput = document.getElementById("importFileInput");
+    const goToCalculatorBtn = document.getElementById("goToCalculatorBtn");
+    const appSectionEl = document.getElementById("appSection");
+
+    initTheme();
+    renderAll();
+    initHeroCardSwap();
+    initBorderGlows();
+
+    function renderAll() {
+      renderTopControls();
+      renderIncomeList();
+      renderExpenseList();
+      renderSummary();
+      renderExpenseChart();
+      saveData();
+    }
+
+    function exportStateToFile() {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        state
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const dateTag = new Date().toISOString().slice(0, 10);
+      link.href = url;
+      link.download = `family-budget-backup-${dateTag}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importStateFromFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result || "{}"));
+          const nextState = parsed.state ? normalizeLoadedState(parsed.state) : normalizeLoadedState(parsed);
+          state = nextState;
+          renderAll();
+          alert("Данные успешно импортированы.");
+        } catch (error) {
+          alert("Не удалось импортировать файл. Проверьте формат JSON.");
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    function renderTopControls() {
+      baseCurrencyEl.value = state.baseCurrency;
+      rateRUBEl.value = numberToInputValue(state.exchangeRatesToRUB.RUB);
+      rateUSDEl.value = numberToInputValue(state.exchangeRatesToRUB.USD);
+      rateEUREl.value = numberToInputValue(state.exchangeRatesToRUB.EUR);
+    }
+
+    function createCurrencySelect(selectedCurrency, onChange) {
+      const select = document.createElement("select");
+
+      CURRENCIES.forEach(currency => {
+        const option = document.createElement("option");
+        option.value = currency;
+        option.textContent = currency;
+        if (currency === selectedCurrency) option.selected = true;
+        select.appendChild(option);
+      });
+
+      select.addEventListener("change", onChange);
+      return select;
+    }
+
+    function createAmountInput(item, onAfterInput) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.inputMode = "decimal";
+      input.placeholder = "Сумма";
+      input.value = numberToAmountInputValue(item.amount);
+
+      input.addEventListener("input", (e) => {
+        item.amount = toNumber(e.target.value);
+        if (typeof onAfterInput === "function") onAfterInput();
+        saveData();
+      });
+
+      input.addEventListener("blur", (e) => {
+        e.target.value = normalizeAmountFieldValue(e.target.value);
+      });
+
+      return input;
+    }
+
+    function renderIncomeList() {
+      incomeListEl.innerHTML = "";
+
+      state.incomes.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "item-row";
+
+        const label = document.createElement("label");
+        label.textContent = item.name;
+
+        const amountInput = createAmountInput(item, () => {
+          renderSummary();
+        });
+
+        const currencySelect = createCurrencySelect(item.currency, (e) => {
+          item.currency = e.target.value;
+          renderSummary();
+          saveData();
+        });
+
+        const actionCell = document.createElement("div");
+
+        if (item.custom) {
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "btn btn-danger btn-small remove-btn";
+          removeBtn.textContent = "✕";
+          removeBtn.title = "Удалить категорию";
+          removeBtn.addEventListener("click", () => {
+            state.incomes = state.incomes.filter((x) => x.id !== item.id);
+            renderAll();
+          });
+          actionCell.appendChild(removeBtn);
+        }
+
+        row.appendChild(label);
+        row.appendChild(amountInput);
+        row.appendChild(currencySelect);
+        row.appendChild(actionCell);
+
+        incomeListEl.appendChild(row);
+      });
+    }
+
+    function renderExpenseList() {
+      expenseListEl.innerHTML = "";
+
+      state.expenses.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "item-row";
+
+        const label = document.createElement("label");
+        label.textContent = item.name;
+
+        const amountInput = createAmountInput(item, () => {
+          renderSummary();
+          renderExpenseChart();
+        });
+
+        const currencySelect = createCurrencySelect(item.currency, (e) => {
+          item.currency = e.target.value;
+          renderSummary();
+          renderExpenseChart();
+          saveData();
+        });
+
+        const actionCell = document.createElement("div");
+
+        if (item.custom) {
+          const removeBtn = document.createElement("button");
+          removeBtn.className = "btn btn-danger btn-small remove-btn";
+          removeBtn.textContent = "✕";
+          removeBtn.title = "Удалить категорию";
+          removeBtn.addEventListener("click", () => {
+            state.expenses = state.expenses.filter((x) => x.id !== item.id);
+            renderAll();
+          });
+          actionCell.appendChild(removeBtn);
+        }
+
+        row.appendChild(label);
+        row.appendChild(amountInput);
+        row.appendChild(currencySelect);
+        row.appendChild(actionCell);
+
+        expenseListEl.appendChild(row);
+      });
+    }
+
+    function renderSummary() {
+      const totalIncome = getTotalIncome();
+      const totalExpense = getTotalExpense();
+      const balance = totalIncome - totalExpense;
+      const savingsRate = totalIncome > 0 ? (balance / totalIncome) * 100 : 0;
+
+      totalIncomeEl.textContent = formatCurrency(totalIncome, state.baseCurrency);
+      totalExpenseEl.textContent = formatCurrency(totalExpense, state.baseCurrency);
+      balanceEl.textContent = formatCurrency(balance, state.baseCurrency);
+
+      balanceEl.classList.remove("balance-positive", "balance-negative", "balance-zero");
+
+      if (balance > 0) {
+        balanceEl.classList.add("balance-positive");
+      } else if (balance < 0) {
+        balanceEl.classList.add("balance-negative");
+      } else {
+        balanceEl.classList.add("balance-zero");
+      }
+
+      savingsRateEl.textContent = `${savingsRate.toFixed(1)}%`;
+    }
+
+    function renderExpenseChart() {
+      expenseChartEl.innerHTML = "";
+
+      const totalExpense = getTotalExpense();
+
+      const nonZeroExpenses = state.expenses
+        .map(item => ({
+          ...item,
+          convertedAmount: getAmountInBaseCurrency(item)
+        }))
+        .filter(item => item.convertedAmount > 0);
+
+      if (nonZeroExpenses.length === 0 || totalExpense === 0) {
+        expenseChartEl.innerHTML = '<div class="muted">Пока нет данных по\u00A0расходам для отображения.</div>';
+        return;
+      }
+
+      const sorted = [...nonZeroExpenses].sort((a, b) => b.convertedAmount - a.convertedAmount);
+
+      sorted.forEach((item) => {
+        const percent = (item.convertedAmount / totalExpense) * 100;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "chart-item";
+
+        const head = document.createElement("div");
+        head.className = "chart-head";
+        head.innerHTML = `
+          <span>${escapeHtml(item.name)} (${item.currency})</span>
+          <span>${formatCurrency(item.convertedAmount, state.baseCurrency)} (${percent.toFixed(1)}%)</span>
+        `;
+
+        const track = document.createElement("div");
+        track.className = "bar-track";
+
+        const fill = document.createElement("div");
+        fill.className = "bar-fill";
+        fill.style.width = "0%";
+        setTimeout(() => {
+          fill.style.width = `${percent}%`;
+        }, 100);
+
+        track.appendChild(fill);
+        wrapper.appendChild(head);
+        wrapper.appendChild(track);
+        expenseChartEl.appendChild(wrapper);
+      });
+    }
+
+    baseCurrencyEl.addEventListener("change", (e) => {
+      state.baseCurrency = e.target.value;
+      renderAll();
+    });
+
+    rateRUBEl.addEventListener("input", (e) => {
+      state.exchangeRatesToRUB.RUB = Math.max(0.0001, toNumber(e.target.value) || 1);
+      renderAll();
+    });
+
+    rateRUBEl.addEventListener("blur", (e) => {
+      e.target.value = numberToInputValue(state.exchangeRatesToRUB.RUB);
+    });
+
+    rateUSDEl.addEventListener("input", (e) => {
+      state.exchangeRatesToRUB.USD = Math.max(0.0001, toNumber(e.target.value));
+      renderAll();
+    });
+
+    rateUSDEl.addEventListener("blur", (e) => {
+      e.target.value = numberToInputValue(state.exchangeRatesToRUB.USD);
+    });
+
+    rateEUREl.addEventListener("input", (e) => {
+      state.exchangeRatesToRUB.EUR = Math.max(0.0001, toNumber(e.target.value));
+      renderAll();
+    });
+
+    rateEUREl.addEventListener("blur", (e) => {
+      e.target.value = numberToInputValue(state.exchangeRatesToRUB.EUR);
+    });
+
+    newIncomeValueEl.addEventListener("blur", (e) => {
+      e.target.value = normalizeAmountFieldValue(e.target.value);
+    });
+
+    newExpenseValueEl.addEventListener("blur", (e) => {
+      e.target.value = normalizeAmountFieldValue(e.target.value);
+    });
+
+    themeToggleBtn.addEventListener("click", () => {
+      const currentTheme = document.body.getAttribute("data-theme");
+      setTheme(currentTheme === "dark" ? "light" : "dark");
+    });
+
+    goToCalculatorBtn.addEventListener("click", () => {
+      appSectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    exportBtn.addEventListener("click", () => {
+      exportStateToFile();
+    });
+
+    importBtn.addEventListener("click", () => {
+      importFileInput.click();
+    });
+
+    importFileInput.addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      importStateFromFile(file);
+      importFileInput.value = "";
+    });
+
+    addIncomeBtn.addEventListener("click", () => {
+      const name = newIncomeNameEl.value.trim();
+      const amount = toNumber(newIncomeValueEl.value);
+      const currency = newIncomeCurrencyEl.value;
+
+      if (!name) {
+        alert("Введите название дохода.");
+        return;
+      }
+
+      state.incomes.push({
+        id: generateId(),
+        name,
+        amount,
+        currency,
+        custom: true
+      });
+
+      newIncomeNameEl.value = "";
+      newIncomeValueEl.value = "";
+      newIncomeCurrencyEl.value = "RUB";
+
+      renderAll();
+    });
+
+    addExpenseBtn.addEventListener("click", () => {
+      const name = newExpenseNameEl.value.trim();
+      const amount = toNumber(newExpenseValueEl.value);
+      const currency = newExpenseCurrencyEl.value;
+
+      if (!name) {
+        alert("Введите название расхода.");
+        return;
+      }
+
+      state.expenses.push({
+        id: generateId(),
+        name,
+        amount,
+        currency,
+        custom: true
+      });
+
+      newExpenseNameEl.value = "";
+      newExpenseValueEl.value = "";
+      newExpenseCurrencyEl.value = "RUB";
+
+      renderAll();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      const ok = confirm("Сбросить все введённые данные?");
+      if (!ok) return;
+
+      state = getDefaultState();
+      renderAll();
+    });
+  </script>
+</body>
+</html>

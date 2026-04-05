@@ -541,6 +541,12 @@ body[data-theme="dark"] .link-btn {
     padding: 24px 32px;
   }
 
+  /* Выравниваем секцию лендинга и основной контент по одной сетке */
+  .landing-wrap {
+    max-width: 1400px;
+    padding: 24px 32px 0;
+  }
+
   .grid {
     grid-template-columns: 1fr 1fr;
   }
