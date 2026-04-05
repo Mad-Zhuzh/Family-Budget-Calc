@@ -430,6 +430,26 @@
       margin-top: 20px;
     }
 
+    .border-glow-card--theme-toggle {
+      --border-radius: 12px;
+      --glow-padding: 30px;
+      --cone-spread: 24;
+      display: inline-grid;
+      margin-bottom: 0;
+      align-self: flex-start;
+    }
+
+    .border-glow-card--theme-toggle .border-glow-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .border-glow-card--theme-toggle .btn-ghost {
+      border: none;
+      box-shadow: none;
+    }
+
     .landing {
       padding: 26px;
     }
@@ -839,7 +859,7 @@
       width: 42px;
       height: 42px;
       padding: 0;
-      border-radius: 50%;
+      border-radius: 12px;
       font-size: 20px;
       line-height: 1;
       display: inline-flex;
@@ -1196,6 +1216,10 @@
         flex-direction: column;
         align-items: stretch;
       }
+
+      .border-glow-card--theme-toggle {
+        align-self: flex-end;
+      }
     }
   </style>
 </head>
@@ -1254,8 +1278,13 @@
         <h2 class="page-title">Калькулятор семейного бюджета</h2>
         <p>Все суммы можно вводить в&nbsp;разных валютах. Итоги автоматически пересчитываются в&nbsp;выбранную основную валюту.</p>
       </div>
-      <!-- Неакцентная кнопка переключения темы -->
-      <button class="btn btn-ghost" id="themeToggleBtn" type="button" title="Переключить тему" aria-label="Переключить тему">🌙</button>
+      <!-- Неакцентная кнопка переключения темы (Border Glow как у панелей) -->
+      <div class="border-glow-card border-glow-card--panel border-glow-card--theme-toggle" id="borderGlowThemeToggle">
+        <span class="edge-light" aria-hidden="true"></span>
+        <div class="border-glow-inner">
+          <button class="btn btn-ghost" id="themeToggleBtn" type="button" title="Переключить тему" aria-label="Переключить тему">🌙</button>
+        </div>
+      </div>
     </div>
 
     <div class="top-controls">
