@@ -36,6 +36,11 @@
       --success: #16a34a;
       --warning: #d97706;
       --radius: 18px;
+      /* Цифры блока «Итоги» (светлая тема) */
+      --summary-income-num: #5b7fa3;
+      --summary-expense-num: #b86262;
+      --summary-balance-num: #14181f;
+      --summary-rate-num: color-mix(in srgb, var(--text) 90%, var(--muted) 10%);
     }
 
     body[data-theme="dark"] {
@@ -62,6 +67,11 @@
       --danger: #f87171;
       --success: #4ade80;
       --warning: #fbbf24;
+      /* Цифры блока «Итоги» (тёмная тема): доход/расход — мягче акцентов UI, без «грязи» мидтона */
+      --summary-income-num: color-mix(in srgb, var(--primary) 68%, #d3e6fd 32%);
+      --summary-expense-num: color-mix(in srgb, var(--danger) 64%, #fcd4d4 36%);
+      --summary-balance-num: #ffffff;
+      --summary-rate-num: color-mix(in srgb, var(--text) 94%, var(--muted) 6%);
     }
 
     * {
@@ -125,6 +135,12 @@
     body[data-theme="dark"] .summary-box {
       box-shadow:
         0 10px 32px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 var(--metal-edge);
+    }
+
+    body[data-theme="dark"] .summary > .summary-box {
+      box-shadow:
+        0 4px 14px rgba(0, 0, 0, 0.28),
         inset 0 1px 0 var(--metal-edge);
     }
 
@@ -369,12 +385,9 @@
       box-shadow: none;
     }
 
-    /* Остаток / баланс — отдельный компактный Border Glow, сильнее свечение */
+    /* Остаток / баланс — спокойная карточка без border-glow (иерархия за счёт размера и типографики) */
     .border-glow-card--balance {
       --border-radius: 16px;
-      --glow-padding: 40px;
-      --edge-sensitivity: 32;
-      --cone-spread: 26;
       display: flex;
       flex-direction: column;
       align-self: stretch;
@@ -384,7 +397,16 @@
       margin: 0;
       background: linear-gradient(145deg, var(--card) 0%, var(--card-soft) 100%);
       border: 1px solid var(--line);
-      box-shadow: var(--shadow-ui), var(--shadow-inset);
+      box-shadow: 0 3px 14px rgba(15, 23, 42, 0.07), inset 0 1px 0 var(--metal-edge);
+    }
+
+    .border-glow-card--balance::before,
+    .border-glow-card--balance::after {
+      display: none;
+    }
+
+    .border-glow-card--balance > .edge-light {
+      display: none;
     }
 
     .border-glow-card--balance > .border-glow-inner {
@@ -394,11 +416,25 @@
       flex-direction: column;
     }
 
+    .border-glow-card--balance .summary-box--balance-inner {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    /* В ряду «Итоги» — та же высота и отступы, что у соседних карточек */
+    .summary > .border-glow-card--balance {
+      height: 100%;
+      min-height: 0;
+    }
+
     body[data-theme="dark"] .border-glow-card--balance {
       background: linear-gradient(145deg, var(--card-soft) 0%, var(--card) 100%);
       border-color: var(--line);
       box-shadow:
-        0 10px 32px rgba(0, 0, 0, 0.45),
+        0 6px 20px rgba(0, 0, 0, 0.32),
         inset 0 1px 0 var(--metal-edge);
     }
 
@@ -877,6 +913,7 @@
     .summary {
       display: grid;
       gap: 14px;
+      align-items: stretch;
     }
 
     .summary-box {
@@ -893,6 +930,38 @@
         background 0.22s ease;
     }
 
+    /* Доход, расход, норма сбережений — вторичный уровень иерархии; единая высота ряда */
+    .summary > .summary-box {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      box-sizing: border-box;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04), inset 0 1px 0 var(--metal-edge);
+    }
+
+    .summary > .summary-box > .summary-title,
+    .summary .border-glow-card--balance .summary-box--balance-inner > .summary-title {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 5px;
+      letter-spacing: 0.01em;
+    }
+
+    .summary > .summary-box > .summary-value {
+      font-size: 27px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .summary > .summary-box > .muted {
+      margin-top: auto;
+      padding-top: 6px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
     .summary-title {
       font-size: 14px;
       color: var(--muted);
@@ -905,11 +974,13 @@
       letter-spacing: -0.025em;
     }
 
+    /* Остаток — главный фокус: крупная цифра, начертание чуть легче 800 */
     #balance {
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: var(--warning);
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      color: var(--summary-balance-num);
     }
 
     .income-value {
@@ -918,6 +989,18 @@
 
     .expense-value {
       color: var(--danger);
+    }
+
+    .summary > .summary-box .income-value {
+      color: var(--summary-income-num);
+    }
+
+    .summary > .summary-box .expense-value {
+      color: var(--summary-expense-num);
+    }
+
+    .summary > .summary-box > #savingsRate {
+      color: var(--summary-rate-num);
     }
 
     .add-row-box {
@@ -1137,7 +1220,8 @@
       }
 
       .summary {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.92fr) minmax(0, 1.16fr) minmax(0, 0.92fr);
       }
     }
 
@@ -1193,8 +1277,12 @@
         flex: none;
       }
 
-      .summary-value {
+      .summary > .summary-box > .summary-value {
         font-size: 24px;
+      }
+
+      #balance {
+        font-size: 38px;
       }
 
       .hero-title {
