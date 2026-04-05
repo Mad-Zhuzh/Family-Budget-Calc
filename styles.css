@@ -389,15 +389,7 @@ body[data-theme="dark"] .link-btn {
   color: var(--danger);
 }
 
-.balance-positive {
-  color: var(--success);
-}
-
-.balance-negative {
-  color: var(--danger);
-}
-
-.balance-zero {
+#balance {
   color: var(--warning);
 }
 

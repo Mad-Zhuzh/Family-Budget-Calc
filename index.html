@@ -909,6 +909,7 @@
       font-size: 34px;
       font-weight: 800;
       letter-spacing: -0.02em;
+      color: var(--warning);
     }
 
     .income-value {
@@ -917,18 +918,6 @@
 
     .expense-value {
       color: var(--danger);
-    }
-
-    .balance-positive {
-      color: var(--primary);
-    }
-
-    .balance-negative {
-      color: var(--danger);
-    }
-
-    .balance-zero {
-      color: var(--warning);
     }
 
     .add-row-box {
@@ -2091,16 +2080,6 @@
       totalIncomeEl.textContent = formatCurrency(totalIncome, state.baseCurrency);
       totalExpenseEl.textContent = formatCurrency(totalExpense, state.baseCurrency);
       balanceEl.textContent = formatCurrency(balance, state.baseCurrency);
-
-      balanceEl.classList.remove("balance-positive", "balance-negative", "balance-zero");
-
-      if (balance > 0) {
-        balanceEl.classList.add("balance-positive");
-      } else if (balance < 0) {
-        balanceEl.classList.add("balance-negative");
-      } else {
-        balanceEl.classList.add("balance-zero");
-      }
 
       savingsRateEl.textContent = `${savingsRate.toFixed(1)}%`;
     }

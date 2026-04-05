@@ -380,16 +380,6 @@ function renderSummary() {
   totalExpenseEl.textContent = formatCurrency(totalExpense, state.baseCurrency);
   balanceEl.textContent = formatCurrency(balance, state.baseCurrency);
 
-  balanceEl.classList.remove("balance-positive", "balance-negative", "balance-zero");
-
-  if (balance > 0) {
-    balanceEl.classList.add("balance-positive");
-  } else if (balance < 0) {
-    balanceEl.classList.add("balance-negative");
-  } else {
-    balanceEl.classList.add("balance-zero");
-  }
-
   savingsRateEl.textContent = `${savingsRate.toFixed(1)}%`;
 }
 
